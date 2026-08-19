@@ -469,12 +469,12 @@
   .bill-name{font-size:14px; font-weight:600;}
   .bill-cat{display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-secondary);}
   .bill-amount{font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:600; text-align:right;}
-  .bill-payment{display:flex; flex-direction:column; gap:2px;}
-  .bill-payment-method{font-size:11px; font-weight:600; padding:2px 7px; border-radius:4px; display:inline-block; width:fit-content;}
-  .bill-payment-method.pix{background:rgba(6,182,212,.12); color:var(--cyan);}
-  .bill-payment-method.credito{background:rgba(99,102,241,.12); color:var(--accent-light);}
-  .bill-payment-method.debito{background:rgba(245,158,11,.12); color:var(--gold);}
-  .bill-payment-installments{font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--text-muted);}
+  .bill-payment{display:flex; flex-direction:column; gap:2px; align-items:flex-end;}
+  .installment-badge{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:700;
+    color:var(--accent-light); background:var(--purple-bg); border:1px solid rgba(139,92,246,.35);
+    border-radius:6px; padding:2px 8px; margin-left:6px; letter-spacing:.02em; vertical-align:middle;
+  }
   .bill-actions{display:flex; gap:6px; justify-content:flex-end; align-items:center;}
   .icon-btn{
     background:none; border:none; cursor:pointer; font-size:14px; padding:5px 7px;
@@ -545,11 +545,6 @@ const CATEGORIES = [
   {id:'assinaturas', name:'Assinaturas', color:'var(--cyan)'},
   {id:'outros', name:'Outros', color:'var(--text-muted)'}
 ];
-const PAYMENT_METHODS = [
-  {id:'pix', name:'PIX'},
-  {id:'credito', name:'Cartão de Crédito'},
-  {id:'debito', name:'Cartão de Débito'}
-];
 const MONTH_NAMES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 let state = null;
@@ -566,7 +561,6 @@ function fmtMoney(n){
   return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function catInfo(id){ return CATEGORIES.find(c=>c.id===id) || CATEGORIES[CATEGORIES.length-1]; }
-function paymentInfo(id){ return PAYMENT_METHODS.find(p=>p.id===id) || null; }
 
 function getMonthData(year, month){
   const key = monthKey(year, month);
@@ -845,18 +839,15 @@ function renderAddBillForm(){
       </div>
       <div class="form-grid-extra">
         <div class="field">
-          <label>Forma de pagamento</label>
-          <select name="paymentMethod" id="payment-method-select">
-            ${PAYMENT_METHODS.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}
+          <label>Tipo</label>
+          <select name="installmentType" id="installment-type-select">
+            <option value="avista">À vista</option>
+            <option value="parcelado">Parcelado</option>
           </select>
         </div>
         <div class="field hidden" id="installment-field">
-          <label>Quantidade de parcelas</label>
-          <input type="number" name="installmentCount" min="1" max="48" placeholder="Ex: 3" value="1">
-        </div>
-        <div class="field">
-          <label>&nbsp;</label>
-          <span style="font-size:11px; color:var(--text-muted);">Selecione Cartão de Crédito para parcelar</span>
+          <label>Qtd. parcelas</label>
+          <input type="number" name="installmentCount" min="2" max="48" placeholder="Ex: 3" value="2">
         </div>
       </div>
     </form>
@@ -870,7 +861,6 @@ function renderBillsTable(bills, monthNum){
   const sorted = [...bills].sort((a,b)=>(a.day||99)-(b.day||99));
   return `<div class="bills-table">` + sorted.map(b=>{
     const c = catInfo(b.category);
-    const pay = paymentInfo(b.paymentMethod);
     const isInstallment = b.installmentCount > 1;
     if(ui.editingId === b.id){
       return renderEditRow(b);
@@ -878,12 +868,11 @@ function renderBillsTable(bills, monthNum){
     return `
       <div class="bill-row ${b.paid?'paid':'unpaid'}">
         <div class="bill-day">${b.day?String(b.day).padStart(2,'0'):'—'}</div>
-        <div class="bill-name">${escapeHtml(b.name)}${isInstallment ? ` <span style="font-size:12px; color:var(--text-muted); font-weight:400;">${b.installmentCurrent}/${b.installmentCount}</span>` : ''}</div>
+        <div class="bill-name">${escapeHtml(b.name)}${isInstallment ? ` <span class="installment-badge">${b.installmentCurrent}/${b.installmentCount}</span>` : ''}</div>
         <div class="bill-cat"><span class="cat-dot" style="background:${c.color}"></span>${c.name}</div>
         <div class="bill-amount">${fmtMoney(b.amount)}</div>
         <div class="bill-payment">
-          ${pay ? `<span class="bill-payment-method ${b.paymentMethod}">${pay.name}</span>` : ''}
-          ${!b.paid ? `<button class="pay-toggle" data-action="toggle-paid" data-id="${b.id}" data-month="${monthNum}" style="margin-top:3px;">marcar pago</button>` : `<span class="stamp" data-action="toggle-paid" data-id="${b.id}" data-month="${monthNum}" title="Clique para desmarcar">PAGO</span>`}
+          ${!b.paid ? `<button class="pay-toggle" data-action="toggle-paid" data-id="${b.id}" data-month="${monthNum}">marcar pago</button>` : `<span class="stamp" data-action="toggle-paid" data-id="${b.id}" data-month="${monthNum}" title="Clique para desmarcar">PAGO</span>`}
         </div>
         <div class="bill-actions">
           <button class="icon-btn" data-action="edit-bill" data-id="${b.id}" data-month="${monthNum}" title="Editar">✎</button>
@@ -895,23 +884,25 @@ function renderBillsTable(bills, monthNum){
 }
 
 function renderEditRow(b){
+  const isInstallment = (b.installmentCount||1) > 1;
   return `
-    <form class="bill-row" data-action="edit-form" data-id="${b.id}" style="grid-template-columns:42px 1.2fr .8fr .7fr .8fr auto auto; background:var(--surface-hover); padding:12px 18px;">
+    <form class="bill-row" data-action="edit-form" data-id="${b.id}" style="grid-template-columns:42px 1.2fr .8fr .7fr .9fr auto; background:var(--surface-hover); padding:12px 18px;">
       <input type="number" name="day" min="1" max="31" value="${b.day||''}" style="width:100%; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary); text-align:center;">
       <input type="text" name="name" value="${escapeHtml(b.name)}" required style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px 8px; background:var(--surface); color:var(--text-primary);">
       <select name="category" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary);">
         ${CATEGORIES.map(c=>`<option value="${c.id}" ${c.id===b.category?'selected':''}>${c.name}</option>`).join('')}
       </select>
       <input type="number" name="amount" step="0.01" min="0" value="${b.amount}" required style="width:100%; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary);">
-      <select name="paymentMethod" class="edit-payment-select" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary); font-size:12px;">
-        ${PAYMENT_METHODS.map(p=>`<option value="${p.id}" ${p.id===b.paymentMethod?'selected':''}>${p.name}</option>`).join('')}
+      <select name="installmentType" class="edit-installment-type" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary); font-size:12px;">
+        <option value="avista" ${!isInstallment?'selected':''}>À vista</option>
+        <option value="parcelado" ${isInstallment?'selected':''}>Parcelado</option>
       </select>
-      <div style="display:flex; flex-direction:column; gap:4px;" class="edit-installment-field ${b.paymentMethod==='credito'?'':'hidden'}">
-        <input type="number" name="installmentCount" min="1" max="48" value="${b.installmentCount||1}" style="width:100%; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:4px 6px; background:var(--surface); color:var(--text-primary); font-size:11px;" placeholder="Qtd parcelas">
-      </div>
       <div style="display:flex; gap:6px; align-items:center;">
         <button type="submit" class="btn btn-accent btn-small">Salvar</button>
         <button type="button" class="btn btn-ghost btn-small" data-action="cancel-edit">Cancelar</button>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:4px; grid-column:1/-1;" class="edit-installment-field ${isInstallment?'':'hidden'}">
+        <input type="number" name="installmentCount" min="2" max="48" value="${b.installmentCount||2}" style="width:140px; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:4px 6px; background:var(--surface); color:var(--text-primary); font-size:11px;" placeholder="Qtd parcelas">
       </div>
     </form>
   `;
@@ -1019,8 +1010,8 @@ function attachEvents(){
       if(!name) return;
       const amount = parseFloat(fd.get('amount'))||0;
       const day = fd.get('day') ? parseInt(fd.get('day'),10) : null;
-      const paymentMethod = fd.get('paymentMethod') || 'pix';
-      const installmentCount = paymentMethod === 'credito' ? (parseInt(fd.get('installmentCount'))||1) : 1;
+      const installmentType = fd.get('installmentType') || 'avista';
+      const installmentCount = installmentType === 'parcelado' ? Math.max(2, parseInt(fd.get('installmentCount'))||2) : 1;
       const category = fd.get('category');
       const viewMonth = state._viewMonth;
 
@@ -1035,7 +1026,6 @@ function attachEvents(){
           amount: amount,
           day: day,
           paid: false,
-          paymentMethod: paymentMethod,
           installmentCount: installmentCount,
           installmentCurrent: i
         };
@@ -1060,8 +1050,8 @@ function attachEvents(){
         bill.category = fd.get('category');
         bill.amount = parseFloat(fd.get('amount'))||0;
         bill.day = fd.get('day') ? parseInt(fd.get('day'),10) : null;
-        bill.paymentMethod = fd.get('paymentMethod') || bill.paymentMethod;
-        bill.installmentCount = bill.paymentMethod === 'credito' ? (parseInt(fd.get('installmentCount'))||1) : 1;
+        const installmentType = fd.get('installmentType') || 'avista';
+        bill.installmentCount = installmentType === 'parcelado' ? Math.max(2, parseInt(fd.get('installmentCount'))||2) : 1;
       }
       ui.editingId = null;
       saveState();
@@ -1071,15 +1061,15 @@ function attachEvents(){
   });
 
   root.addEventListener('change', (e)=>{
-    if(e.target.id === 'payment-method-select'){
+    if(e.target.id === 'installment-type-select'){
       const field = document.getElementById('installment-field');
-      if(e.target.value === 'credito') field.classList.remove('hidden');
+      if(e.target.value === 'parcelado') field.classList.remove('hidden');
       else field.classList.add('hidden');
     }
-    if(e.target.classList.contains('edit-payment-select')){
+    if(e.target.classList.contains('edit-installment-type')){
       const form = e.target.closest('form');
       const field = form.querySelector('.edit-installment-field');
-      if(e.target.value === 'credito') field.classList.remove('hidden');
+      if(e.target.value === 'parcelado') field.classList.remove('hidden');
       else field.classList.add('hidden');
     }
     if(e.target.dataset.action === 'set-budget'){
