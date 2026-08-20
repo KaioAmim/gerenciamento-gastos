@@ -1,4 +1,4 @@
-const CACHE_NAME = 'livro-caixa-v1';
+const CACHE_NAME = 'livro-caixa-v2';
 const ASSETS = [
   './index.html',
   './manifest.json',

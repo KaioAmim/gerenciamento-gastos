@@ -1,6 +1,6 @@
 {
-  "name": "Livro Caixa - Controle Financeiro",
-  "short_name": "Livro Caixa",
+  "name": "Gerenciamento de Gastos",
+  "short_name": "Gastos",
   "description": "Controle financeiro inteligente: contas, rendas, categorias e saldo mensal.",
   "start_url": "./index.html",
   "scope": "./",
