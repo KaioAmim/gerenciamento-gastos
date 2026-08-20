@@ -446,6 +446,33 @@
   .field select option{background:var(--surface-card); color:var(--text-primary);}
   .field.hidden { display: none; }
   .btn.hidden{ display:none; }
+
+  /* METAS */
+  .goals-list{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:14px; margin-bottom:18px;}
+  .empty-note{color:var(--text-muted); font-size:13px; margin-bottom:18px;}
+  .goal-card{background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius); padding:18px;}
+  .goal-card.goal-done{border-color:rgba(16,185,129,.4);}
+  .goal-top{display:flex; align-items:center; gap:14px; margin-bottom:14px;}
+  .goal-ring-wrap{position:relative; width:96px; height:96px; flex-shrink:0;}
+  .goal-ring-wrap svg{display:block;}
+  .goal-info{flex:1; min-width:0;}
+  .goal-name{font-weight:600; font-size:14.5px;}
+  .goal-check{color:var(--green); font-size:11.5px; font-weight:600;}
+  .goal-values{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-secondary); margin-top:4px;}
+  .goal-saved{color:var(--accent-light); font-weight:700;}
+  .goal-of{color:var(--text-muted);}
+  .goal-remaining{font-size:11.5px; color:var(--text-muted); margin-top:4px;}
+  .goal-delete{flex-shrink:0; align-self:flex-start;}
+  .goal-add{display:flex; gap:8px;}
+  .goal-add-input{flex:1; min-width:0; border:1px solid var(--border); border-radius:6px; padding:8px 10px; background:var(--surface); color:var(--text-primary); font-size:12.5px; font-family:'JetBrains Mono',monospace;}
+  .goal-form-grid{grid-template-columns:1.4fr 1fr auto;}
+  @media (max-width:480px){
+    .goals-list{grid-template-columns:1fr;}
+    .goal-form-grid{grid-template-columns:1fr;}
+    .goal-top{gap:12px;}
+    .goal-ring-wrap{width:80px; height:80px;}
+    .goal-ring-wrap svg{width:80px; height:80px;}
+  }
   @media (max-width:480px){
     #install-app-btn{width:100%; margin-top:8px;}
   }
@@ -573,6 +600,7 @@ function defaultState(){
   return {
     budgets:{},
     months:{},
+    goals:[],
     globalIncomeFixed: 0,
     incomeMinimized: false,
     _viewMonth: now.getMonth() + 1
@@ -589,6 +617,7 @@ function loadState(){
       if(!state._viewMonth) state._viewMonth = new Date().getMonth() + 1;
       if(state.globalIncomeFixed === undefined) state.globalIncomeFixed = 0;
       if(state.incomeMinimized === undefined) state.incomeMinimized = false;
+      if(!state.goals) state.goals = [];
       return;
     }
   }catch(e){ console.error('Erro ao carregar dados:', e); }
@@ -719,6 +748,11 @@ function render(){
       </section>
 
       <section class="block">
+        <h2 class="section-title"><span class="section-icon">🎯</span> Metas <span class="count">${state.goals.length}</span></h2>
+        ${renderGoals(saldo)}
+      </section>
+
+      <section class="block">
         <h2 class="section-title"><span class="section-icon">➕</span> Adicionar conta</h2>
         ${renderAddBillForm()}
       </section>
@@ -811,6 +845,61 @@ function renderCategoryBars(bills){
       </div>
     `;
   }).join('') + `</div>`;
+}
+
+function renderGoals(saldo){
+  const goalsHtml = state.goals.length ? state.goals.map(g => {
+    const pct = g.target > 0 ? Math.min((g.saved / g.target) * 100, 100) : 0;
+    const done = g.saved >= g.target;
+    const r = 40;
+    const circ = 2 * Math.PI * r;
+    const offset = circ - (pct/100) * circ;
+    const ringColor = done ? 'var(--green)' : 'var(--accent-light)';
+    return `
+      <div class="goal-card ${done?'goal-done':''}">
+        <div class="goal-top">
+          <div class="goal-ring-wrap">
+            <svg width="96" height="96" viewBox="0 0 96 96">
+              <circle class="ring-track" cx="48" cy="48" r="${r}"></circle>
+              <circle class="ring-fill" cx="48" cy="48" r="${r}" stroke="${ringColor}"
+                stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 48 48)"></circle>
+            </svg>
+            <div class="ring-center">
+              <span class="ring-pct" style="color:${ringColor}">${pct.toFixed(0)}%</span>
+              ${done ? `<span class="ring-label">✓ feito</span>` : `<span class="ring-label">da meta</span>`}
+            </div>
+          </div>
+          <div class="goal-info">
+            <p class="goal-name">${escapeHtml(g.name)}${done ? ' <span class="goal-check">✓ Concluída</span>' : ''}</p>
+            <p class="goal-values"><span class="goal-saved">${fmtMoney(g.saved)}</span> <span class="goal-of">de</span> ${fmtMoney(g.target)}</p>
+            <p class="goal-remaining">${done ? 'Meta atingida!' : `Faltam ${fmtMoney(g.target - g.saved)}`}</p>
+          </div>
+          <button class="icon-btn goal-delete" data-action="delete-goal" data-id="${g.id}" title="Excluir meta">✕</button>
+        </div>
+        <div class="goal-add">
+          <input type="number" step="0.01" min="0" placeholder="Adicionar R$ (ex: do mês)" class="goal-add-input" data-id="${g.id}">
+          <button class="btn btn-small btn-accent" data-action="add-goal-amount" data-id="${g.id}">+ Adicionar</button>
+        </div>
+      </div>
+    `;
+  }).join('') : `<p class="empty-note">Nenhuma meta cadastrada ainda. Crie uma abaixo — por exemplo, "Reserva de emergência" ou "Viagem".</p>`;
+
+  return `
+    <div class="goals-list">${goalsHtml}</div>
+    <form class="add-form goal-form" id="form-add-goal">
+      <div class="form-grid goal-form-grid">
+        <div class="field">
+          <label>Nome da meta</label>
+          <input type="text" name="name" placeholder="Ex: Reserva de emergência" required>
+        </div>
+        <div class="field">
+          <label>Valor da meta (R$)</label>
+          <input type="number" name="target" step="0.01" min="0.01" placeholder="0,00" required>
+        </div>
+        <button type="submit" class="btn btn-accent">Criar meta</button>
+      </div>
+    </form>
+  `;
 }
 
 function renderAddBillForm(){
@@ -921,6 +1010,23 @@ function attachEvents(){
     if(!btn) return;
     const action = btn.dataset.action;
 
+    if(action==='add-goal-amount'){
+      const id = btn.dataset.id;
+      const input = root.querySelector(`.goal-add-input[data-id="${id}"]`);
+      const val = parseFloat(input && input.value) || 0;
+      if(val > 0){
+        const goal = state.goals.find(g=>g.id===id);
+        if(goal){ goal.saved = Number(goal.saved||0) + val; saveState(); render(); }
+      }
+      return;
+    }
+    if(action==='delete-goal'){
+      const id = btn.dataset.id;
+      state.goals = state.goals.filter(g=>g.id!==id);
+      saveState();
+      render();
+      return;
+    }
     if(action==='toggle-income'){
       state.incomeMinimized = !state.incomeMinimized;
       saveState();
@@ -1035,6 +1141,17 @@ function attachEvents(){
         currentMonthNum = next.month;
       }
 
+      saveState();
+      render();
+      return;
+    }
+    if(form.id === 'form-add-goal'){
+      e.preventDefault();
+      const fd = new FormData(form);
+      const name = (fd.get('name')||'').trim();
+      const target = parseFloat(fd.get('target'))||0;
+      if(!name || target <= 0) return;
+      state.goals.push({ id: uid(), name, target, saved: 0 });
       saveState();
       render();
       return;
