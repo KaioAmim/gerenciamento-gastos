@@ -132,40 +132,50 @@
   .btn-green{background:var(--green); color:#fff;}
   .btn-green:hover{box-shadow:0 4px 12px rgba(16,185,129,.3);}
 
-  /* PERIOD PICKER (year + month) — clean, flat style */
-  .year-selector{
-    display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:14px;
+  /* PERIOD PICKER — compact month/year selector */
+  .period-picker{
+    display:flex; align-items:center; justify-content:center; gap:4px;
+    margin:0 0 20px;
   }
-  .year-selector select{
+  .period-picker .period-select{
+    appearance:none; -webkit-appearance:none;
     font-family:'JetBrains Mono', monospace;
-    font-size:15px; font-weight:700;
-    padding:4px 8px;
-    background:transparent;
+    font-size:14px; font-weight:700;
+    padding:7px 30px 7px 10px;
+    background:var(--surface-card);
     color:var(--text-primary);
-    border:none;
+    border:1px solid var(--border);
+    border-radius:8px;
     cursor:pointer;
-    transition: color .15s ease;
     text-align:center;
+    outline:none;
+    background-image:linear-gradient(45deg,transparent 50%,var(--text-muted) 50%),
+                     linear-gradient(135deg,var(--text-muted) 50%,transparent 50%);
+    background-position:calc(100% - 14px) 12px,calc(100% - 9px) 12px;
+    background-size:5px 5px,5px 5px;
+    background-repeat:no-repeat;
+    transition:border-color .15s ease, background-color .15s ease;
   }
-  .year-selector select:hover{color:var(--accent-light);}
-  .year-selector select:focus{outline:none;}
-  .year-selector select option{background:var(--surface-card); color:var(--text-primary);}
-  .year-nav{
-    background:none; border:none;
-    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
-    color:var(--text-muted); cursor:pointer; font-size:15px;
-    border-radius:6px;
-    transition: all .15s ease;
+  .period-picker .period-select:hover,
+  .period-picker .period-select:focus{border-color:var(--accent-light); background-color:var(--surface-hover);}
+  .period-picker .period-select option{background:var(--surface-card); color:var(--text-primary);}
+  .period-nav{
+    background:none; border:none; width:30px; height:30px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--text-muted); cursor:pointer; font-size:18px;
+    border-radius:7px; transition:all .15s ease;
   }
-  .year-nav:hover{background:var(--surface-hover); color:var(--text-primary);}
+  .period-nav:hover{background:var(--surface-hover); color:var(--text-primary);}
 
-  /* MONTH TABS */
+  /* compact legacy tabs (kept for other components) */
   .tabs{display:flex; gap:2px; flex-wrap:wrap; margin-bottom:28px; align-items:center; justify-content:center;}
   @media (max-width:640px){
+    .period-picker{margin-bottom:16px;}
+    .period-picker .period-select{font-size:13px; padding:6px 28px 6px 8px;}
+    .period-nav{width:28px; height:28px;}
     .tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -14px 24px; padding:0 14px 6px; scroll-snap-type:x proximity; justify-content:flex-start;}
     .tabs::-webkit-scrollbar{display:none;}
     .tab{flex:0 0 auto; scroll-snap-align:start;}
-    .year-selector{margin-bottom:10px;}
   }
   .tab{
     font-family:'JetBrains Mono', monospace;
@@ -318,14 +328,6 @@
   .section-icon{font-size:18px;}
   section.block{margin-bottom:32px;}
 
-  /* FINANÇAS MONTH PICKER */
-  .financas-month-picker{
-    background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius);
-    padding:16px 18px; margin-bottom:24px;
-  }
-  .financas-month-picker .year-selector{margin-bottom:12px;}
-  .financas-month-picker .tabs{margin-bottom:0;}
-
   /* CATEGORY BARS */
   .cat-row{display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--border);}
   .cat-row:last-child{border-bottom:none;}
@@ -356,14 +358,14 @@
   .add-form > .form-subhead:first-child{ margin-top:0; padding-top:0; border-top:none; }
   .form-grid{display:grid; grid-template-columns:2fr 1fr 1fr .7fr; gap:12px; align-items:end;}
   .form-grid-extra{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:center; margin-bottom:16px;}
-  .field-checkbox{ display:flex; align-items:center; justify-content:flex-start; }
+  .field-checkbox{ margin-top:20px; display:flex; align-items:center; justify-content:flex-start; }
   .btn-add-bill{ width:100%; margin-top:2px; }
   @media (max-width:720px){ .form-grid{grid-template-columns:1fr 1fr;} .form-grid-extra{grid-template-columns:1fr;} }
   @media (max-width:480px){
     form.add-form{padding:16px;}
     .form-grid{grid-template-columns:1fr;}
   }
-  .field label{display:block; font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:5px;}
+  .field label{font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted);}
   .field input, .field select{
     width:100%; font-family:'Inter',sans-serif; font-size:13.5px;
     border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px;
@@ -723,20 +725,15 @@ function render(){
 
 function renderHomePage(monthNum, m, bills, totalPaid, totalPending, totalIncome, saldo, isSurplus, isMinimized){
   return `
-    <div class="year-selector">
-      <button class="year-nav" data-action="prev-year">‹</button>
-      <select id="year-select" data-action="change-year">
+    <div class="period-picker">
+      <button class="period-nav" data-action="prev-year" title="Ano anterior">‹</button>
+      <select id="month-select" class="period-select" data-action="change-month" aria-label="Selecionar mês">
+        ${MONTH_NAMES.map((name, i) => `<option value="${i+1}" ${i+1===monthNum?'selected':''}>${name}</option>`).join('')}
+      </select>
+      <select id="year-select" class="period-select" data-action="change-year" aria-label="Selecionar ano">
         ${getYearOptions()}
       </select>
-      <button class="year-nav" data-action="next-year">›</button>
-    </div>
-
-    <div class="tabs">
-      ${MONTH_NAMES.map((name, i) => {
-        const month = i + 1;
-        const isActive = month === monthNum;
-        return `<div class="tab ${isActive?'active':''}" data-action="select-month" data-month="${month}">${name}</div>`;
-      }).join('')}
+      <button class="period-nav" data-action="next-year" title="Próximo ano">›</button>
     </div>
 
     <div class="dashboard-card">
@@ -838,20 +835,16 @@ function renderConfigPage(monthNum, m, totalIncome){
 
 function renderFinancasPage(monthNum, bills){
   return `
-    <div class="financas-month-picker">
-      <div class="year-selector">
-        <button class="year-nav" data-action="prev-year">‹</button>
-        <select id="year-select" data-action="change-year">
+    <div>
+      <div class="period-picker">
+        <button class="period-nav" data-action="prev-year" title="Ano anterior">‹</button>
+        <select id="month-select" class="period-select" data-action="change-month" aria-label="Selecionar mês">
+          ${MONTH_NAMES.map((name, i) => `<option value="${i+1}" ${i+1===monthNum?'selected':''}>${name}</option>`).join('')}
+        </select>
+        <select id="year-select" class="period-select" data-action="change-year" aria-label="Selecionar ano">
           ${getYearOptions()}
         </select>
-        <button class="year-nav" data-action="next-year">›</button>
-      </div>
-      <div class="tabs">
-        ${MONTH_NAMES.map((name, i) => {
-          const month = i + 1;
-          const isActive = month === monthNum;
-          return `<div class="tab ${isActive?'active':''}" data-action="select-month" data-month="${month}">${name}</div>`;
-        }).join('')}
+        <button class="period-nav" data-action="next-year" title="Próximo ano">›</button>
       </div>
     </div>
 
@@ -1193,6 +1186,16 @@ function escapeHtml(s){
 // ---------- EVENTS ----------
 function attachEvents(){
   const root = document.getElementById('root');
+
+  root.addEventListener('change', (e)=>{
+    const el = e.target.closest('[data-action]');
+    if(!el) return;
+    if(el.dataset.action==='change-month'){
+      state._viewMonth = parseInt(el.value, 10);
+      saveState();
+      render();
+    }
+  });
 
   root.addEventListener('click', (e)=>{
     const btn = e.target.closest('[data-action]');
