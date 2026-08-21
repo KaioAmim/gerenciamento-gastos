@@ -132,46 +132,48 @@
   .btn-green{background:var(--green); color:#fff;}
   .btn-green:hover{box-shadow:0 4px 12px rgba(16,185,129,.3);}
 
-  /* YEAR SELECTOR */
+  /* PERIOD PICKER (year + month) — clean, flat style */
   .year-selector{
-    display:flex; align-items:center; gap:12px; margin-bottom:20px;
+    display:flex; align-items:center; justify-content:center; gap:6px; margin-bottom:14px;
   }
   .year-selector select{
     font-family:'JetBrains Mono', monospace;
-    font-size:14px; font-weight:600;
-    padding:8px 16px;
-    background:var(--surface-card);
+    font-size:15px; font-weight:700;
+    padding:4px 8px;
+    background:transparent;
     color:var(--text-primary);
-    border:1px solid var(--border-light);
-    border-radius:8px;
+    border:none;
     cursor:pointer;
-    transition: all .15s ease;
+    transition: color .15s ease;
+    text-align:center;
   }
-  .year-selector select:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(99,102,241,.15);}
+  .year-selector select:hover{color:var(--accent-light);}
+  .year-selector select:focus{outline:none;}
   .year-selector select option{background:var(--surface-card); color:var(--text-primary);}
   .year-nav{
-    background:none; border:1px solid var(--border); border-radius:8px;
-    width:36px; height:36px; display:flex; align-items:center; justify-content:center;
-    color:var(--text-secondary); cursor:pointer; font-size:16px;
+    background:none; border:none;
+    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
+    color:var(--text-muted); cursor:pointer; font-size:15px;
+    border-radius:6px;
     transition: all .15s ease;
   }
-  .year-nav:hover{background:var(--surface-hover); border-color:var(--accent); color:var(--text-primary);}
+  .year-nav:hover{background:var(--surface-hover); color:var(--text-primary);}
 
   /* MONTH TABS */
-  .tabs{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:28px; align-items:center;}
+  .tabs{display:flex; gap:2px; flex-wrap:wrap; margin-bottom:28px; align-items:center; justify-content:center;}
   @media (max-width:640px){
-    .tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -14px 24px; padding:0 14px 6px; scroll-snap-type:x proximity;}
+    .tabs{flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -14px 24px; padding:0 14px 6px; scroll-snap-type:x proximity; justify-content:flex-start;}
     .tabs::-webkit-scrollbar{display:none;}
     .tab{flex:0 0 auto; scroll-snap-align:start;}
-    .year-selector{margin-bottom:16px;}
+    .year-selector{margin-bottom:10px;}
   }
   .tab{
     font-family:'JetBrains Mono', monospace;
     font-size:12.5px; font-weight:500;
-    padding:8px 14px 7px;
-    background:var(--surface);
-    color:var(--text-secondary);
-    border:1px solid var(--border);
+    padding:7px 12px;
+    background:none;
+    color:var(--text-muted);
+    border:none;
     border-radius:8px;
     cursor:pointer;
     letter-spacing:.02em;
@@ -181,39 +183,36 @@
   .tab.active{
     background:var(--accent);
     color:#fff;
-    border-color:var(--accent);
-    box-shadow: 0 2px 12px rgba(99,102,241,.3);
   }
 
-  /* CARDS / SUMMARY */
-  .grid-summary{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap:16px;
-    margin-bottom:28px;
-  }
-  @media (max-width:640px){
-    .grid-summary{grid-template-columns:1fr 1fr; gap:10px;}
-    .income-card-full{grid-column:1/-1; padding:14px 16px;}
-  }
-  @media (max-width:400px){
-    .grid-summary{grid-template-columns:1fr;}
-  }
-
-  /* DASHBOARD VISUAL: progress ring + spend bar */
-  .dash-visual{
-    grid-column:1/-1;
+  /* DASHBOARD CARD (Home) */
+  .dashboard-card{
     background:var(--surface-card);
     border:1px solid var(--border);
     border-radius:var(--radius);
-    padding:20px 24px;
+    padding:22px 24px;
+    margin-bottom:28px;
+  }
+  .dashboard-head{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    margin-bottom:18px;
+  }
+  .dashboard-head span{font-size:13px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em;}
+  .link-btn{
+    background:none; border:none; color:var(--accent-light); font-size:12.5px; font-weight:600;
+    cursor:pointer; display:flex; align-items:center; gap:6px; padding:4px 0;
+  }
+  .link-btn:hover{color:var(--accent);}
+
+  /* DASHBOARD VISUAL: progress ring + spend bar */
+  .dash-visual{
     display:flex;
     align-items:center;
     gap:28px;
     flex-wrap:wrap;
   }
   @media (max-width:640px){
-    .dash-visual{padding:16px; gap:16px; flex-direction:column; align-items:stretch;}
+    .dash-visual{gap:16px; flex-direction:column; align-items:stretch;}
   }
   .ring-wrap{position:relative; width:112px; height:112px; flex-shrink:0; margin:0 auto;}
   .ring-wrap svg{transform:rotate(-90deg);}
@@ -229,88 +228,37 @@
   .dash-metric-row .dm-value{font-family:'JetBrains Mono',monospace; font-weight:600;}
   .dash-spend-track{height:10px; border-radius:6px; background:var(--surface); overflow:hidden; display:flex; margin-top:2px;}
   .dash-spend-seg{height:100%; transition:width 1s cubic-bezier(.4,0,.2,1);}
-  
-  /* INCOME SECTION REDESIGN */
-  .income-card-full {
-    grid-column: 1 / -1;
-    background: var(--surface-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    transition: all 0.3s ease;
+
+  /* STAT STRIP (compact row instead of separate cards) */
+  .stat-strip{
+    display:flex; margin-top:20px; padding-top:18px; border-top:1px solid var(--border);
   }
-  .income-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
+  .stat-item{
+    flex:1; text-align:center; display:flex; flex-direction:column; gap:4px;
+    border-left:1px solid var(--border);
   }
-  .income-header .label {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--text-muted);
-    font-weight: 700;
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .stat-item:first-child{border-left:none;}
+  .stat-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); font-weight:600;}
+  .stat-value{font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:700;}
+  @media (max-width:480px){
+    .stat-strip{flex-direction:column; gap:10px;}
+    .stat-item{border-left:none; flex-direction:row; align-items:center; justify-content:space-between;}
   }
-  .income-toggle-btn {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
+
+  /* CONFIG PAGE (income settings) */
+  .config-card{
+    background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:22px 24px;
   }
-  .income-toggle-btn:hover {
-    background: var(--surface-hover);
-    color: var(--text-primary);
-    border-color: var(--accent);
+  .config-row{display:flex; gap:20px; flex-wrap:wrap; margin-bottom:18px;}
+  .config-row .field{flex:1; min-width:200px;}
+  .config-total{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 0; border-top:1px solid var(--border); margin-bottom:16px;
+    font-size:13px; color:var(--text-secondary);
   }
-  .income-content {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-  }
-  .income-card-full.minimized .income-content {
-    max-height: 0;
-    opacity: 0;
-    margin: 0;
-    pointer-events: none;
-  }
-  .income-card-full.minimized {
-    padding-bottom: 16px;
-  }
-  .income-row-horizontal {
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .income-item {
-    flex: 1;
-    min-width: 180px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .income-item label {
-    font-size: 10px;
-    color: var(--text-secondary);
-    font-weight: 600;
-    text-transform: uppercase;
-  }
+  .config-total strong{font-family:'JetBrains Mono',monospace; font-size:19px; color:var(--green);}
+  .btn-full{width:100%;}
   .income-input-wrapper {
     display: flex;
     align-items: center;
@@ -340,62 +288,22 @@
     width: 100%;
     outline: none;
   }
-  .income-total-display {
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    border-left: 1px solid var(--border);
-  }
-  .income-total-display .total-label {
-    font-size: 10px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 2px;
-  }
-  .income-total-display .total-value {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--green);
-  }
-  @media (max-width:640px){
-    .income-row-horizontal{gap:14px;}
-    .income-item{min-width:100%;}
-    .income-total-display{border-left:none; border-top:1px solid var(--border); padding:12px 0 0; width:100%;}
-    .save-income-btn{width:100%; align-self:stretch;}
-  }
+  .btn-accent.saved{background:var(--green);}
 
-  .card{
-    background:var(--surface-card);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:18px 20px;
-    transition: border-color .15s ease;
+  /* GOALS MINI (Home) */
+  .goals-mini-card{ margin-bottom:28px; }
+  .goals-mini-card .dashboard-head span{ display:flex; align-items:center; gap:8px; }
+  .goals-mini-list{ display:flex; flex-wrap:wrap; gap:24px; justify-content:center; }
+  .goal-mini-row{ display:flex; flex-direction:column; align-items:center; gap:4px; width:110px; text-align:center; }
+  .goal-mini-ring-wrap{ position:relative; width:100px; height:100px; }
+  .goal-mini-ring-wrap svg{ display:block; width:100px;height:100px;}
+  .goal-mini-ring-center{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-weight:400; font-size:18px;
   }
-  .card:hover{border-color:var(--border-light); transform:translateY(-2px);}
-  .card{transition: border-color .15s ease, transform .15s ease;}
-  .card:active{transform:translateY(0) scale(.98);}
-  .tab:active, .btn:active, .icon-btn:active{transform:scale(.95);}
-  .card .label{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); margin:0 0 8px; font-weight:600;}
-  .card .value{font-family:'JetBrains Mono',monospace; font-size:22px; font-weight:600; margin:0;}
-  .card.paid .value{color:var(--accent-light);}
-  .card.pending .value{color:var(--red);}
-  .card.balance .value{color:var(--gold);}
-  .card.balance.surplus .value{color:var(--green);}
-  .card.balance.deficit .value{color:var(--red);}
-  
-  .save-income-btn{
-    font-family:'Inter',sans-serif; font-size:12px; font-weight:600;
-    background:var(--accent); color:#fff; border:none; border-radius:8px;
-    padding:10px 20px; cursor:pointer; transition:all .15s ease;
-    align-self: flex-end;
-  }
-  .save-income-btn:hover{background:var(--accent-dark); transform: translateY(-1px);}
-  .save-income-btn.saved{background:var(--green);}
-  .balance-status{font-size:12px; font-weight:600; margin-top:4px; text-transform:uppercase; letter-spacing:.06em;}
-  .balance-status.surplus{color:var(--green);}
-  .balance-status.deficit{color:var(--red);}
+  .goal-mini-name{ font-size:16px; color:var(--text-secondary); font-weight:600; margin-top:5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:96px; }
+  .goal-mini-values{ font-family:'JetBrains Mono',monospace; margin-top:4px; font-size:13.5px; color: #74787e; }
+  .goal-mini-sep{color: #595e64;}
 
   /* SECTION HEADERS */
   .section-title{
@@ -409,6 +317,14 @@
   }
   .section-icon{font-size:18px;}
   section.block{margin-bottom:32px;}
+
+  /* FINANÇAS MONTH PICKER */
+  .financas-month-picker{
+    background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px 18px; margin-bottom:24px;
+  }
+  .financas-month-picker .year-selector{margin-bottom:12px;}
+  .financas-month-picker .tabs{margin-bottom:0;}
 
   /* CATEGORY BARS */
   .cat-row{display:flex; align-items:center; gap:14px; padding:10px 0; border-bottom:1px solid var(--border);}
@@ -432,13 +348,20 @@
     background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius);
     padding:20px 22px; margin-bottom:28px;
   }
-  .form-grid{display:grid; grid-template-columns:2fr 1fr 1fr .7fr auto; gap:12px; align-items:end;}
-  .form-grid-extra{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:end; margin-top:12px; padding-top:14px; border-top:1px solid var(--border);}
+  .form-subhead{
+    font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--text-muted); margin:18px 0 10px;
+    padding-top:14px; border-top:1px solid var(--border);
+  }
+  .add-form > .form-subhead:first-child{ margin-top:0; padding-top:0; border-top:none; }
+  .form-grid{display:grid; grid-template-columns:2fr 1fr 1fr .7fr; gap:12px; align-items:end;}
+  .form-grid-extra{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; align-items:center; margin-bottom:16px;}
+  .field-checkbox{ display:flex; align-items:center; justify-content:flex-start; }
+  .btn-add-bill{ width:100%; margin-top:2px; }
   @media (max-width:720px){ .form-grid{grid-template-columns:1fr 1fr;} .form-grid-extra{grid-template-columns:1fr;} }
   @media (max-width:480px){
     form.add-form{padding:16px;}
     .form-grid{grid-template-columns:1fr;}
-    .form-grid .btn{width:100%; padding:12px;}
   }
   .field label{display:block; font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:5px;}
   .field input, .field select{
@@ -483,10 +406,11 @@
   /* RELATÓRIO */
   .report-header{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:18px; }
   .report-header .section-title{ margin-bottom:0; }
-  .report-summary{ display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:8px; }
-  .report-mini{ background:var(--surface-card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:4px; }
-  .rm-label{ font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; }
-  .rm-value{ font-family:'JetBrains Mono',monospace; font-weight:700; font-size:17px; }
+  .report-summary{
+    background:var(--surface-card); border:1px solid var(--border); border-radius:var(--radius);
+    padding:16px 20px; margin-bottom:8px;
+  }
+  .report-summary.stat-strip{ margin-top:0; padding-top:16px; border-top:none; }
   @media (max-width:480px){
     .report-header{ flex-direction:column; align-items:stretch; }
     .report-header .btn{ width:100%; }
@@ -750,7 +674,8 @@ const NAV_ITEMS = [
   { id:'home', icon:'fa-solid fa-house', label:'Home' },
   { id:'financas', icon:'fa-solid fa-wallet', label:'Finanças' },
   { id:'metas', icon:'fa-solid fa-bullseye', label:'Metas' },
-  { id:'relatorio', icon:'fa-solid fa-chart-pie', label:'Relatório' }
+  { id:'relatorio', icon:'fa-solid fa-chart-pie', label:'Relatório' },
+  { id:'config', icon:'fa-solid fa-gear', label:'Config' }
 ];
 
 function render(){
@@ -772,7 +697,7 @@ function render(){
       <div class="wrap">
         <div class="brand">
           <h1>Gerenciamento de Gastos</h1>
-          <p>Controle financeiro inteligente</p>
+          <p>Controle de renda</p>
         </div>
         <button id="install-app-btn" class="btn btn-accent hidden"><i class="fa-solid fa-download"></i> Instalar app</button>
       </div>
@@ -782,6 +707,7 @@ function render(){
       ${page === 'financas' ? renderFinancasPage(monthNum, bills) : ''}
       ${page === 'metas' ? renderMetasPage(saldo) : ''}
       ${page === 'relatorio' ? renderRelatorioPage(monthNum, bills, totalPaid, totalPending, totalIncome, saldo) : ''}
+      ${page === 'config' ? renderConfigPage(monthNum, m, totalIncome) : ''}
       <p class="foot-note">Os dados ficam salvos automaticamente no seu navegador.</p>
     </div>
     <nav class="bottom-nav">
@@ -813,64 +739,124 @@ function renderHomePage(monthNum, m, bills, totalPaid, totalPending, totalIncome
       }).join('')}
     </div>
 
-    <div class="grid-summary">
-      <div class="income-card-full ${isMinimized ? 'minimized' : ''}">
-        <div class="income-header" data-action="toggle-income">
-          <p class="label">
-            <span class="section-icon"><i class="fa-solid fa-sack-dollar"></i></span> 
-            Configuração de Rendas
-            ${isMinimized ? `<span style="color:var(--green); font-size:12px; margin-left:8px; text-transform:none;">(Total: ${fmtMoney(totalIncome)})</span>` : ''}
-          </p>
-          <button class="income-toggle-btn">${isMinimized ? 'Expandir' : 'Minimizar'}</button>
-        </div>
-        <div class="income-content">
-          <div class="income-row-horizontal">
-            <div class="income-item">
-              <label>Renda Fixa (Global)</label>
-              <div class="income-input-wrapper">
-                <span class="currency">R$</span>
-                <input type="number" step="0.01" min="0" id="income-fixed" value="${state.globalIncomeFixed||0}" placeholder="0,00">
-              </div>
-            </div>
-            <div class="income-item">
-              <label>Renda Variável (${MONTH_NAMES[monthNum-1]})</label>
-              <div class="income-input-wrapper">
-                <span class="currency">R$</span>
-                <input type="number" step="0.01" min="0" id="income-var" value="${m.incomeVar||0}" placeholder="0,00">
-              </div>
-            </div>
-            <div class="income-total-display">
-              <span class="total-label">Renda Total do Mês</span>
-              <span class="total-value">${fmtMoney(totalIncome)}</span>
-            </div>
-            <button class="save-income-btn" data-action="save-income">Salvar Rendas</button>
-          </div>
-        </div>
+    <div class="dashboard-card">
+      <div class="dashboard-head">
+        <span>${monthLabelFull(monthNum, ui.selectedYear)}</span>
+        <button class="link-btn" data-action="nav" data-page="config"><i class="fa-solid fa-gear"></i> Editar renda</button>
       </div>
 
       ${renderDashVisual(totalIncome, totalPaid, totalPending, saldo, isSurplus)}
 
-      <div class="card paid">
-        <p class="label">Total pago</p>
-        <p class="value">${fmtMoney(totalPaid)}</p>
+      <div class="stat-strip">
+        <div class="stat-item">
+          <span class="stat-label">Pago</span>
+          <span class="stat-value" style="color:var(--accent-light)">${fmtMoney(totalPaid)}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Pendente</span>
+          <span class="stat-value" style="color:var(--red)">${fmtMoney(totalPending)}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Saldo</span>
+          <span class="stat-value" style="color:${isSurplus?'var(--green)':'var(--red)'}">${isSurplus?'':'-'}${fmtMoney(Math.abs(saldo))}</span>
+        </div>
       </div>
-      <div class="card pending">
-        <p class="label">Total pendente</p>
-        <p class="value">${fmtMoney(totalPending)}</p>
+    </div>
+
+    ${renderGoalsMini()}
+  `;
+}
+
+function renderGoalsMini(){
+  if(!state.goals || state.goals.length===0) return '';
+  return `
+    <div class="dashboard-card goals-mini-card">
+      <div class="dashboard-head">
+        <span><i class="fa-solid fa-bullseye"></i> Metas</span>
+        <button class="link-btn" data-action="nav" data-page="metas">Ver todas <i class="fa-solid fa-chevron-right"></i></button>
       </div>
-      <div class="card balance ${isSurplus?'surplus':'deficit'}">
-        <p class="label">Saldo</p>
-        <p class="value">${fmtMoney(Math.abs(saldo))}</p>
-        <p class="balance-status ${isSurplus?'surplus':'deficit'}">${isSurplus?'✓ Sobra dinheiro':'✗ Falta dinheiro'}</p>
+      <div class="goals-mini-list">
+        ${state.goals.map(g => {
+          const pct = g.target > 0 ? Math.min(g.saved / g.target * 100, 100) : 0;
+          const done = g.saved >= g.target;
+          const ringColor = done ? 'var(--green)' : 'var(--accent-light)';
+          const r = 30;
+          const circ = 2 * Math.PI * r;
+          const offset = circ - (pct/100) * circ;
+          return `
+            <div class="goal-mini-row">
+              <div class="goal-mini-ring-wrap">
+                <svg width="72" height="72" viewBox="0 0 72 72">
+                  <circle class="ring-track" cx="36" cy="36" r="${r}"></circle>
+                  <circle class="ring-fill" cx="36" cy="36" r="${r}" stroke="${ringColor}"
+                    stroke-dasharray="${circ}" stroke-dashoffset="${offset}" transform="rotate(-90 36 36)"></circle>
+                </svg>
+                <div class="goal-mini-ring-center">
+                  <span style="color:${ringColor}">${pct.toFixed(0)}%</span>
+                </div>
+              </div>
+              <span class="goal-mini-name">${escapeHtml(g.name)}${done ? ' <i class="fa-solid fa-circle-check" style="color:var(--green)"></i>' : ''}</span>
+              <span class="goal-mini-values">${fmtMoney(g.saved)} <span class="goal-mini-sep">/</span> ${fmtMoney(g.target)}</span>
+            </div>
+          `;
+        }).join('')}
       </div>
     </div>
   `;
 }
 
-function renderFinancasPage(monthNum, bills){
+function renderConfigPage(monthNum, m, totalIncome){
   return `
     <section class="block">
-      <h2 class="section-title"><span class="section-icon"><i class="fa-solid fa-plus"></i></span> Adicionar conta</h2>
+      <h2 class="section-title"><span class="section-icon"><i class="fa-solid fa-sack-dollar"></i></span> Configuração de rendas</h2>
+      <div class="config-card">
+        <div class="config-row">
+          <div class="field">
+            <label>Renda fixa (todo mês)</label>
+            <div class="income-input-wrapper">
+              <span class="currency">R$</span>
+              <input type="number" step="0.01" min="0" id="income-fixed" value="${state.globalIncomeFixed||0}" placeholder="0,00">
+            </div>
+          </div>
+          <div class="field">
+            <label>Renda variável (${monthLabelFull(monthNum, ui.selectedYear)})</label>
+            <div class="income-input-wrapper">
+              <span class="currency">R$</span>
+              <input type="number" step="0.01" min="0" id="income-var" value="${m.incomeVar||0}" placeholder="0,00">
+            </div>
+          </div>
+        </div>
+        <div class="config-total">
+          <span>Renda total do mês</span>
+          <strong>${fmtMoney(totalIncome)}</strong>
+        </div>
+        <button class="btn btn-accent btn-full" data-action="save-income">Salvar rendas</button>
+      </div>
+    </section>
+  `;
+}
+
+function renderFinancasPage(monthNum, bills){
+  return `
+    <div class="financas-month-picker">
+      <div class="year-selector">
+        <button class="year-nav" data-action="prev-year">‹</button>
+        <select id="year-select" data-action="change-year">
+          ${getYearOptions()}
+        </select>
+        <button class="year-nav" data-action="next-year">›</button>
+      </div>
+      <div class="tabs">
+        ${MONTH_NAMES.map((name, i) => {
+          const month = i + 1;
+          const isActive = month === monthNum;
+          return `<div class="tab ${isActive?'active':''}" data-action="select-month" data-month="${month}">${name}</div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <section class="block">
+      <h2 class="section-title"><span class="section-icon"><i class="fa-solid fa-plus"></i></span> Adicionar conta em ${monthLabelFull(monthNum, ui.selectedYear)}</h2>
       ${renderAddBillForm()}
     </section>
 
@@ -897,11 +883,11 @@ function renderRelatorioPage(monthNum, bills, totalPaid, totalPending, totalInco
         <h2 class="section-title"><span class="section-icon"><i class="fa-solid fa-chart-pie"></i></span> Relatório de ${monthLabelFull(monthNum, ui.selectedYear)}</h2>
         <button class="btn btn-accent" data-action="export-excel"><i class="fa-solid fa-file-arrow-down"></i> Exportar Excel</button>
       </div>
-      <div class="report-summary">
-        <div class="report-mini"><span class="rm-label">Renda</span><span class="rm-value" style="color:var(--green)">${fmtMoney(totalIncome)}</span></div>
-        <div class="report-mini"><span class="rm-label">Pago</span><span class="rm-value" style="color:var(--accent-light)">${fmtMoney(totalPaid)}</span></div>
-        <div class="report-mini"><span class="rm-label">Pendente</span><span class="rm-value" style="color:var(--red)">${fmtMoney(totalPending)}</span></div>
-        <div class="report-mini"><span class="rm-label">Saldo</span><span class="rm-value" style="color:${saldo>=0?'var(--green)':'var(--red)'}">${fmtMoney(saldo)}</span></div>
+      <div class="report-summary stat-strip">
+        <div class="stat-item"><span class="stat-label">Renda</span><span class="stat-value" style="color:var(--green)">${fmtMoney(totalIncome)}</span></div>
+        <div class="stat-item"><span class="stat-label">Pago</span><span class="stat-value" style="color:var(--accent-light)">${fmtMoney(totalPaid)}</span></div>
+        <div class="stat-item"><span class="stat-label">Pendente</span><span class="stat-value" style="color:var(--red)">${fmtMoney(totalPending)}</span></div>
+        <div class="stat-item"><span class="stat-label">Saldo</span><span class="stat-value" style="color:${saldo>=0?'var(--green)':'var(--red)'}">${fmtMoney(saldo)}</span></div>
       </div>
     </section>
 
@@ -985,10 +971,6 @@ function renderDashVisual(totalIncome, totalPaid, totalPending, saldo, isSurplus
         <div class="dash-metric-row">
           <span class="dm-label"><span class="dot" style="background:var(--green)"></span>Renda total</span>
           <span class="dm-value" style="color:var(--green)">${fmtMoney(totalIncome)}</span>
-        </div>
-        <div class="dash-metric-row">
-          <span class="dm-label"><span class="dot" style="background:var(--accent-light)"></span>Pago / Pendente</span>
-          <span class="dm-value">${fmtMoney(totalPaid)} <span style="color:var(--text-muted)">/</span> ${fmtMoney(totalPending)}</span>
         </div>
         <div class="dash-spend-track">
           <div class="dash-spend-seg" style="width:${paidPct}%; background:var(--accent-light);"></div>
@@ -1096,6 +1078,7 @@ function renderGoals(saldo){
 function renderAddBillForm(){
   return `
     <form class="add-form" id="form-add-bill">
+      <div class="form-subhead">Dados da conta</div>
       <div class="form-grid">
         <div class="field">
           <label>Nome da conta</label>
@@ -1115,8 +1098,9 @@ function renderAddBillForm(){
           <label>Dia venc.</label>
           <input type="number" name="day" min="1" max="31" placeholder="10">
         </div>
-        <button type="submit" class="btn btn-accent">Adicionar</button>
       </div>
+
+      <div class="form-subhead">Recorrência</div>
       <div class="form-grid-extra">
         <div class="field">
           <label>Tipo</label>
@@ -1129,13 +1113,15 @@ function renderAddBillForm(){
           <label>Qtd. parcelas</label>
           <input type="number" name="installmentCount" min="2" max="48" placeholder="Ex: 3" value="2">
         </div>
-        <div class="field" style="justify-content:flex-end;">
+        <div class="field field-checkbox">
           <label class="checkbox-field">
             <input type="checkbox" name="isFixed" id="is-fixed-checkbox">
             <span>Conta fixa <small>(repete todo mês)</small></span>
           </label>
         </div>
       </div>
+
+      <button type="submit" class="btn btn-accent btn-add-bill">Adicionar conta</button>
     </form>
   `;
 }
