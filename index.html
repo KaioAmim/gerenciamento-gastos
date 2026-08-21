@@ -71,7 +71,7 @@
   @media (max-width:640px){
     .wrap{padding:0 14px;}
     header{padding:20px 0 18px; margin-bottom:18px;}
-    .brand h1{font-size:24px;}
+    .brand h1{font-size:18px;}
     .brand p{font-size:12px;}
   }
 
@@ -91,8 +91,8 @@
   header{
     background: linear-gradient(135deg, #1E2130 0%, #0F1117 100%);
     border-bottom:1px solid var(--border);
-    padding:32px 0 28px;
-    margin-bottom:28px;
+    padding:32px 0 20px;
+    margin-bottom:10px;
   }
   header .wrap{display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:14px;}
   @media (max-width:480px){
@@ -100,7 +100,7 @@
   }
   .brand h1{
     font-weight:800;
-    font-size:30px;
+    font-size:18px;
     margin:0 0 4px;
     letter-spacing:-.02em;
     background: linear-gradient(135deg, var(--accent-light), var(--purple));
@@ -108,7 +108,7 @@
     -webkit-text-fill-color:transparent;
     background-clip:text;
   }
-  .brand p{margin:0; font-size:13.5px; color:var(--text-secondary); font-weight:400;}
+  .brand p{margin:0; font-size:10.5px; color:var(--text-secondary); font-weight:400;}
   .btn{
     font-family:'Inter', sans-serif;
     font-weight:600;
@@ -532,6 +532,18 @@
 
   .foot-note{text-align:center; font-size:12px; color:var(--text-muted); margin-top:32px; opacity:.6;}
 
+
+  /* BACKUP / DATA MANAGEMENT */
+  .backup-card{background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-top:18px;}
+  .backup-head{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+  .backup-head .backup-icon{width:38px;height:38px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0;}
+  .backup-title{font-size:15px;font-weight:700;}
+  .backup-subtitle{font-size:12px;color:var(--text-secondary);line-height:1.5;margin:0 0 16px 50px;}
+  .backup-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .backup-actions .btn{width:100%;padding:9px 10px;font-size:12px;}
+  .backup-note{font-size:11px;color:var(--text-muted);line-height:1.5;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+  @media(max-width:640px){.backup-actions{grid-template-columns:1fr;}.backup-card{padding:16px;}.backup-subtitle{margin-left:0;}.backup-head{margin-bottom:8px;}}
+
   /* Scrollbar */
   ::-webkit-scrollbar{width:6px;}
   ::-webkit-scrollbar-track{background:var(--bg);}
@@ -830,6 +842,21 @@ function renderConfigPage(monthNum, m, totalIncome){
           <strong>${fmtMoney(totalIncome)}</strong>
         </div>
         <button class="btn btn-accent btn-full" data-action="save-income">Salvar rendas</button>
+      </div>
+
+      <div class="backup-card">
+        <div class="backup-head">
+          <div class="backup-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+          <div class="backup-title">Backup dos dados</div>
+        </div>
+        <p class="backup-subtitle">Leve seus gastos para outro dispositivo usando um arquivo de backup. Nenhum dado é enviado para um servidor.</p>
+        <div class="backup-actions">
+          <button class="btn btn-outline" data-action="export-data"><i class="fa-solid fa-download"></i> Exportar</button>
+          <button class="btn btn-outline" data-action="import-data"><i class="fa-solid fa-upload"></i> Importar</button>
+          <button class="btn btn-ghost" data-action="merge-data"><i class="fa-solid fa-code-merge"></i> Mesclar</button>
+        </div>
+        <input type="file" id="data-import-input" accept=".json,application/json" style="display:none">
+        <p class="backup-note"><strong>Importar</strong> substitui os dados atuais. <strong>Mesclar</strong> mantém os dados atuais e adiciona/atualiza o que existir no backup.</p>
       </div>
     </section>
   `;
@@ -1189,6 +1216,221 @@ function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
+
+// ---------- BACKUP / IMPORT ----------
+function buildBackup(){
+  return {
+    app: 'Gerenciamento de Gastos',
+    formatVersion: 1,
+    exportedAt: new Date().toISOString(),
+    data: JSON.parse(JSON.stringify(state))
+  };
+}
+
+function exportData(){
+  const backup = buildBackup();
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `meu-livro-caixa-${date}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function validateBackup(payload){
+  if(!payload || typeof payload !== 'object') return false;
+  const data = payload.data || payload;
+  return data && typeof data === 'object' && typeof data.months === 'object' && Array.isArray(data.goals);
+}
+
+function normalizeImportedData(payload){
+  const data = payload.data || payload;
+  return {
+    budgets: data.budgets && typeof data.budgets === 'object' ? data.budgets : {},
+    months: data.months && typeof data.months === 'object' ? data.months : {},
+    goals: Array.isArray(data.goals) ? data.goals : [],
+    globalIncomeFixed: Number(data.globalIncomeFixed)||0,
+    incomeMinimized: !!data.incomeMinimized,
+    _viewMonth: Number(data._viewMonth)||new Date().getMonth()+1,
+    selectedYear: Number(data.selectedYear)||new Date().getFullYear()
+  };
+}
+
+function importDataFromFile(file, mode){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const payload = JSON.parse(reader.result);
+      if(!validateBackup(payload)) throw new Error('Formato inválido');
+      const incoming = normalizeImportedData(payload);
+
+      if(mode === 'replace'){
+        if(!confirm('Importar este backup substituirá todos os dados atuais neste dispositivo. Continuar?')) return;
+        state = incoming;
+        ui.selectedYear = incoming.selectedYear;
+        ui.editingId = null;
+        saveState();
+        render();
+        alert('Dados importados com sucesso!');
+        return;
+      }
+
+      if(!confirm('Mesclar este backup com os dados atuais?\n\nRegistros idênticos não serão duplicados. Quando houver o mesmo item com informações diferentes, o sistema perguntará o que fazer.')) return;
+      mergeState(incoming);
+      saveState();
+      render();
+      alert('Dados mesclados com sucesso!');
+    }catch(err){
+      console.error(err);
+      alert('Não foi possível importar o arquivo. Verifique se ele é um backup válido do Gerenciamento de Gastos.');
+    }finally{
+      const input = document.getElementById('data-import-input');
+      if(input) input.value = '';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function cloneData(value){
+  return JSON.parse(JSON.stringify(value));
+}
+
+function sameData(a,b){
+  return JSON.stringify(a) === JSON.stringify(b);
+}
+
+function withoutId(obj){
+  const copy = cloneData(obj || {});
+  delete copy.id;
+  return copy;
+}
+
+function askMergeConflict(title, current, incoming, fields){
+  const lines = fields.map(([label,key,format])=>{
+    const formatter = format || (v => String(v ?? '—'));
+    return `${label}:\n  Atual: ${formatter(current[key])}\n  Importado: ${formatter(incoming[key])}`;
+  }).join('\n\n');
+
+  const answer = prompt(
+    `⚠️ CONFLITO AO MESCLAR\n\n${title}\n\n${lines}\n\n`+
+    `Digite uma opção:\n`+
+    `1 = Manter o atual\n`+
+    `2 = Usar o importado\n`+
+    `3 = Manter os dois\n\n`+
+    `Cancelar = pular este item`,
+    '1'
+  );
+
+  if(answer === '1') return 'current';
+  if(answer === '2') return 'incoming';
+  if(answer === '3') return 'both';
+  return 'skip';
+}
+
+function mergeRecord(list, incomingRecord, identityFn, fields, titleFn){
+  const incomingClean = cloneData(incomingRecord);
+  const exactIndex = list.findIndex(item => sameData(withoutId(item), withoutId(incomingClean)));
+  if(exactIndex !== -1) return;
+
+  const incomingIdentity = identityFn(incomingClean);
+  const conflictIndex = list.findIndex(item => identityFn(item) === incomingIdentity);
+
+  if(conflictIndex === -1){
+    list.push(incomingClean);
+    return;
+  }
+
+  const current = list[conflictIndex];
+  const choice = askMergeConflict(titleFn(current, incomingClean), current, incomingClean, fields);
+
+  if(choice === 'incoming'){
+    list[conflictIndex] = incomingClean;
+  }else if(choice === 'both'){
+    if(incomingClean.id && list.some(item => item.id === incomingClean.id)){
+      incomingClean.id = uid();
+    }
+    list.push(incomingClean);
+  }
+}
+
+function mergeState(incoming){
+  state.budgets = {...(state.budgets||{}), ...(incoming.budgets||{})};
+  if(incoming.globalIncomeFixed !== undefined && incoming.globalIncomeFixed !== state.globalIncomeFixed){
+    const choice = askMergeConflict(
+      'Renda fixa mensal',
+      {value: Number(state.globalIncomeFixed||0)},
+      {value: Number(incoming.globalIncomeFixed||0)},
+      [['Valor','value',v=>fmtMoney(v)]]
+    );
+    if(choice === 'incoming') state.globalIncomeFixed = Number(incoming.globalIncomeFixed||0);
+    else if(choice === 'both') state.globalIncomeFixed = Number(incoming.globalIncomeFixed||0);
+  }
+
+  Object.entries(incoming.months||{}).forEach(([key, incomingMonth])=>{
+    if(!state.months[key]){
+      state.months[key] = cloneData(incomingMonth);
+      return;
+    }
+
+    const currentMonth = state.months[key];
+    if(incomingMonth.incomeVar !== undefined && incomingMonth.incomeVar !== currentMonth.incomeVar){
+      const choice = askMergeConflict(
+        `Renda variável de ${key}`,
+        {value:Number(currentMonth.incomeVar||0)},
+        {value:Number(incomingMonth.incomeVar||0)},
+        [['Valor','value',v=>fmtMoney(v)]]
+      );
+      if(choice === 'incoming' || choice === 'both') currentMonth.incomeVar = Number(incomingMonth.incomeVar||0);
+    }
+
+    const currentBills = Array.isArray(currentMonth.bills) ? currentMonth.bills : [];
+    const incomingBills = Array.isArray(incomingMonth.bills) ? incomingMonth.bills : [];
+
+    incomingBills.forEach(b=>{
+      mergeRecord(
+        currentBills,
+        b,
+        bill => [bill.day, String(bill.name||'').trim().toLowerCase(), bill.category||''].join('|'),
+        [
+          ['Conta','name'],
+          ['Dia','day'],
+          ['Categoria','category'],
+          ['Valor','amount',v=>fmtMoney(v)],
+          ['Status','paid',v=>v?'Pago':'Pendente']
+        ],
+        (a,c)=>`Conta ${c.name||''} — ${key}`
+      );
+    });
+    currentMonth.bills = currentBills;
+  });
+
+  const goals = Array.isArray(state.goals) ? state.goals : [];
+  const incomingGoals = Array.isArray(incoming.goals) ? incoming.goals : [];
+  incomingGoals.forEach(g=>{
+    mergeRecord(
+      goals,
+      g,
+      goal => String(goal.name||'').trim().toLowerCase(),
+      [
+        ['Meta','name'],
+        ['Valor da meta','target',v=>fmtMoney(v)],
+        ['Valor guardado','saved',v=>fmtMoney(v)]
+      ],
+      (a,c)=>`Meta "${c.name||''}"`
+    );
+  });
+
+  state.goals = goals;
+  state._viewMonth = incoming._viewMonth || state._viewMonth;
+  state.selectedYear = incoming.selectedYear || state.selectedYear;
+  ui.selectedYear = state.selectedYear;
+}
+
 // ---------- EVENTS ----------
 function attachEvents(){
   const root = document.getElementById('root');
@@ -1205,6 +1447,15 @@ function attachEvents(){
     }
     if(action==='export-excel'){
       exportMonthToExcel();
+      return;
+    }
+    if(action==='export-data'){
+      exportData();
+      return;
+    }
+    if(action==='import-data' || action==='merge-data'){
+      const input = document.getElementById('data-import-input');
+      if(input){ input.dataset.importMode = action==='merge-data' ? 'merge' : 'replace'; input.click(); }
       return;
     }
     if(action==='add-goal-amount'){
@@ -1395,6 +1646,11 @@ function attachEvents(){
   });
 
   root.addEventListener('change', (e)=>{
+    if(e.target.id === 'data-import-input'){
+      const file = e.target.files && e.target.files[0];
+      if(file) importDataFromFile(file, e.target.dataset.importMode || 'replace');
+      return;
+    }
     if(e.target.id === 'installment-type-select'){
       const field = document.getElementById('installment-field');
       if(e.target.value === 'parcelado') field.classList.remove('hidden');
