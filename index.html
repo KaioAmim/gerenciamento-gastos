@@ -373,6 +373,7 @@
   .field select option{background:var(--surface-card); color:var(--text-primary);}
   .field.hidden { display: none; }
   .btn.hidden{ display:none; }
+  .hidden{ display:none !important; }
 
   /* NAV MENU */
   body{ padding-bottom:84px; }
@@ -598,7 +599,8 @@ function getMonthData(year, month){
         paid: false,
         installmentCount: 1,
         installmentCurrent: 1,
-        isFixed: true
+        isFixed: true,
+        fixedOriginId: b.fixedOriginId || b.id
       }));
     }
   }
@@ -678,6 +680,48 @@ function currentMonthNum(){
 function nextMonthKey(year, month){
   if(month === 12) return { year: year+1, month: 1 };
   return { year, month: month+1 };
+}
+
+// Chronological sort key for a "YYYY-MM" month key, so months can be compared
+// regardless of insertion order.
+function monthKeyOrder(key){
+  const [y, mo] = key.split('-').map(Number);
+  return y * 12 + mo;
+}
+
+// Pushes/updates a "conta fixa" into every month that already exists in
+// state.months and comes chronologically after the origin month. This fixes
+// the case where a later month got materialized (e.g. the person browsed to
+// it, or opened a report) BEFORE the fixed bill existed — without this, that
+// already-created month would never pick the fixed bill up on its own, since
+// getMonthData() only auto-carries recurring bills into months the first
+// time they're created.
+function propagateFixedBillForward(originYear, originMonth, template){
+  const originOrder = monthKeyOrder(monthKey(originYear, originMonth));
+  Object.keys(state.months).forEach(key => {
+    if(monthKeyOrder(key) <= originOrder) return;
+    const monthData = state.months[key];
+    const existing = monthData.bills.find(b => b.fixedOriginId === template.fixedOriginId);
+    if(existing){
+      existing.name = template.name;
+      existing.category = template.category;
+      existing.amount = template.amount;
+      existing.day = template.day;
+    } else {
+      monthData.bills.push({
+        id: uid(),
+        name: template.name,
+        category: template.category,
+        amount: template.amount,
+        day: template.day,
+        paid: false,
+        installmentCount: 1,
+        installmentCurrent: 1,
+        isFixed: true,
+        fixedOriginId: template.fixedOriginId
+      });
+    }
+  });
 }
 
 // ---------- RENDER ----------
@@ -1200,7 +1244,7 @@ function renderEditRow(b){
         <button type="button" class="btn btn-ghost btn-small" data-action="cancel-edit">Cancelar</button>
       </div>
       <div style="display:flex; flex-direction:column; gap:4px; grid-column:1/-1;" class="edit-installment-field ${(isInstallment && !b.isFixed)?'':'hidden'}">
-        <input type="number" name="installmentCount" min="2" max="48" value="${b.installmentCount||2}" style="width:140px; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:4px 6px; background:var(--surface); color:var(--text-primary); font-size:11px;" placeholder="Qtd parcelas">
+        <input type="number" name="installmentCount" min="2" max="48" value="${Math.max(2, b.installmentCount||2)}" ${(isInstallment && !b.isFixed)?'':'disabled'} style="width:140px; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:4px 6px; background:var(--surface); color:var(--text-primary); font-size:11px;" placeholder="Qtd parcelas">
       </div>
       <div style="grid-column:1/-1;">
         <label class="checkbox-field">
@@ -1571,10 +1615,12 @@ function attachEvents(){
       const viewMonth = state._viewMonth;
 
       if(isFixed){
-        // Conta fixa: entra só no mês atual; a partir daqui ela é
-        // replicada automaticamente para os próximos meses (getMonthData).
+        // Conta fixa: entra no mês atual e é replicada automaticamente para
+        // os próximos meses — tanto os que já existem quanto os que forem
+        // criados depois (ver getMonthData / propagateFixedBillForward).
         const monthData = getMonthData(ui.selectedYear, viewMonth);
-        monthData.bills.push({
+        const fixedOriginId = uid();
+        const newBill = {
           id: uid(),
           name: name,
           category: category,
@@ -1583,8 +1629,11 @@ function attachEvents(){
           paid: false,
           installmentCount: 1,
           installmentCurrent: 1,
-          isFixed: true
-        });
+          isFixed: true,
+          fixedOriginId: fixedOriginId
+        };
+        monthData.bills.push(newBill);
+        propagateFixedBillForward(ui.selectedYear, viewMonth, newBill);
       } else {
         let currentYear = ui.selectedYear;
         let currentMonthNum = viewMonth;
@@ -1637,6 +1686,13 @@ function attachEvents(){
         const isFixed = fd.get('isFixed') === 'on';
         bill.installmentCount = (!isFixed && installmentType === 'parcelado') ? Math.max(2, parseInt(fd.get('installmentCount'))||2) : 1;
         bill.isFixed = isFixed;
+        if(isFixed){
+          // Garante um id de linhagem (contas fixas antigas podem não ter) e
+          // sincroniza nome/categoria/valor/dia com os meses futuros já
+          // gerados a partir desta conta fixa.
+          if(!bill.fixedOriginId) bill.fixedOriginId = bill.id;
+          propagateFixedBillForward(ui.selectedYear, currentMonthNum(), bill);
+        }
       }
       ui.editingId = null;
       saveState();
@@ -1670,17 +1726,25 @@ function attachEvents(){
     if(e.target.classList.contains('edit-installment-type')){
       const form = e.target.closest('form');
       const field = form.querySelector('.edit-installment-field');
-      if(e.target.value === 'parcelado') field.classList.remove('hidden');
-      else field.classList.add('hidden');
+      const countInput = field.querySelector('[name=installmentCount]');
+      if(e.target.value === 'parcelado'){
+        field.classList.remove('hidden');
+        countInput.disabled = false;
+      } else {
+        field.classList.add('hidden');
+        countInput.disabled = true;
+      }
     }
     if(e.target.type === 'checkbox' && e.target.name === 'isFixed'){
       const form = e.target.closest('form');
       const typeSelect = form.querySelector('.edit-installment-type');
       const field = form.querySelector('.edit-installment-field');
+      const countInput = field.querySelector('[name=installmentCount]');
       if(e.target.checked){
         typeSelect.value = 'avista';
         typeSelect.disabled = true;
         field.classList.add('hidden');
+        countInput.disabled = true;
       } else {
         typeSelect.disabled = false;
       }
