@@ -364,7 +364,8 @@
   }
   .field label{ font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--text-muted); margin-bottom:5px;}
   .field input, .field select{
-    width:100%; font-family:'Inter',sans-serif; font-size:13.5px;
+    width:100%; min-height:42px; box-sizing:border-box;
+    font-family:'Inter',sans-serif; font-size:13.5px;
     border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px;
     background:var(--surface); color:var(--text-primary);
     transition: border-color .15s ease;
@@ -534,6 +535,247 @@
   .foot-note{text-align:center; font-size:12px; color:var(--text-muted); margin-top:32px; opacity:.6;}
 
 
+  /* MOBILE-FRIENDLY BILL EDITOR */
+  .edit-bill-form{
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    padding:18px;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg,var(--surface-hover),var(--surface-card));
+  }
+  .edit-form-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--border);
+  }
+  .edit-form-head strong{
+    display:block;
+    font-size:14px;
+    color:var(--text-primary);
+  }
+  .edit-form-head strong i{color:var(--accent-light);margin-right:6px;}
+  .edit-form-head span{
+    display:block;
+    margin-top:4px;
+    font-size:11.5px;
+    color:var(--text-muted);
+  }
+  .edit-form-grid{
+    display:grid;
+    grid-template-columns:.65fr 1.5fr 1fr 1fr 1fr;
+    gap:12px;
+    align-items:end;
+  }
+  .edit-bill-form .field label{
+    display:block;
+  }
+  .edit-bill-form .field input,
+  .edit-bill-form .field select{
+    min-height:44px;
+    box-sizing:border-box;
+  }
+  .edit-bill-form input,
+  .edit-bill-form select{
+    -webkit-appearance:none;
+    appearance:none;
+  }
+  .edit-bill-form input[type="number"]{
+    font-family:'JetBrains Mono',monospace;
+  }
+  .edit-installment-field{
+    max-width:220px;
+  }
+  .edit-installment-field .field input{
+    width:100%;
+  }
+  .edit-fixed-check{
+    padding:10px 12px;
+    width:max-content;
+    max-width:100%;
+    border:1px solid var(--border);
+    border-radius:var(--radius-sm);
+    background:var(--surface);
+  }
+  .edit-form-actions{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    padding-top:4px;
+  }
+  .edit-form-actions .btn{
+    min-height:42px;
+  }
+
+  /* DELETE SERIES MODAL */
+  .delete-modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:200;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(3,6,12,.72);
+    backdrop-filter:blur(7px);
+    animation:modal-fade-in .16s ease-out;
+  }
+  .delete-modal{
+    width:min(460px,100%);
+    background:var(--surface-card);
+    border:1px solid var(--border-light);
+    border-radius:18px;
+    padding:22px;
+    box-shadow:0 24px 70px rgba(0,0,0,.45);
+    animation:modal-slide-up .18s ease-out;
+  }
+  .delete-modal-icon{
+    width:44px;
+    height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:13px;
+    background:var(--red-bg);
+    color:var(--red);
+    margin-bottom:14px;
+  }
+  .delete-modal-content h3{
+    margin:0;
+    font-size:17px;
+  }
+  .delete-modal-content p{
+    margin:6px 0 4px;
+    color:var(--text-secondary);
+    font-size:13px;
+  }
+  .delete-modal-content > span{
+    display:block;
+    color:var(--text-muted);
+    font-size:11.5px;
+    line-height:1.5;
+  }
+  .delete-modal-options{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    margin-top:18px;
+  }
+  .delete-option{
+    width:100%;
+    display:grid;
+    grid-template-columns:38px 1fr 16px;
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    text-align:left;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--surface);
+    color:var(--text-primary);
+    cursor:pointer;
+    transition:background .15s ease,border-color .15s ease,transform .1s ease;
+  }
+  .delete-option:hover{
+    background:var(--surface-hover);
+    border-color:var(--accent);
+  }
+  .delete-option:active{transform:scale(.99);}
+  .delete-option-icon{
+    width:38px;
+    height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    background:var(--purple-bg);
+    color:var(--accent-light);
+  }
+  .delete-option.danger .delete-option-icon{
+    background:var(--red-bg);
+    color:var(--red);
+  }
+  .delete-option strong{
+    display:block;
+    font-size:13px;
+  }
+  .delete-option small{
+    display:block;
+    margin-top:3px;
+    font-size:10.5px;
+    line-height:1.4;
+    color:var(--text-muted);
+  }
+  .delete-option > i{
+    color:var(--text-muted);
+    font-size:11px;
+  }
+  .delete-modal-cancel{
+    width:100%;
+    min-height:42px;
+    margin-top:10px;
+  }
+  @keyframes modal-fade-in{from{opacity:0}to{opacity:1}}
+  @keyframes modal-slide-up{from{transform:translateY(8px) scale(.98);opacity:.7}to{transform:translateY(0) scale(1);opacity:1}}
+
+  @media(max-width:720px){
+    .edit-form-grid{
+      grid-template-columns:1fr 1fr;
+    }
+    .edit-field-name{
+      grid-column:span 2;
+    }
+  }
+
+  @media(max-width:480px){
+    .edit-bill-form{
+      padding:16px 14px;
+      gap:14px;
+    }
+    .edit-form-head{
+      align-items:flex-start;
+    }
+    .edit-form-grid{
+      grid-template-columns:1fr;
+      gap:12px;
+    }
+    .edit-field-name{
+      grid-column:auto;
+    }
+    .edit-bill-form .field input,
+    .edit-bill-form .field select{
+      min-height:46px;
+      font-size:16px;
+      padding:10px 12px;
+    }
+    .edit-installment-field{
+      max-width:none;
+    }
+    .edit-fixed-check{
+      width:100%;
+      box-sizing:border-box;
+      min-height:44px;
+    }
+    .edit-form-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+    }
+    .edit-form-actions .btn{
+      width:100%;
+    }
+    .delete-modal{
+      padding:18px;
+      border-radius:16px;
+    }
+    .delete-option{
+      grid-template-columns:36px 1fr 14px;
+      padding:11px;
+    }
+  }
+
   /* BACKUP / DATA MANAGEMENT */
   .backup-card{background:var(--surface-card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-top:18px;}
   .backup-head{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
@@ -612,22 +854,82 @@ function prevMonthKey(year, month){
   return { year, month: month-1 };
 }
 
-// Looks backward for the nearest month that already exists in state and
-// returns its "conta fixa" bills, so they can be carried forward into a
-// brand-new month. Stops at the first existing month found (even if it has
-// no fixed bills), so removing a recurring bill stops it from then on.
+// Finds recurring templates from previous months. The template store is
+// what lets a fixed bill continue recurring even when it was deleted only
+// from one already-created month.
+function upsertFixedTemplate(year, month, bill){
+  if(!bill || !bill.isFixed) return;
+  const originId = bill.fixedOriginId || bill.id;
+  const order = monthKeyOrder(monthKey(year, month));
+  state.fixedRecurrenceTemplates = state.fixedRecurrenceTemplates || {};
+
+  const previous = state.fixedRecurrenceTemplates[originId];
+  state.fixedRecurrenceTemplates[originId] = {
+    name: bill.name,
+    category: bill.category,
+    amount: bill.amount,
+    day: bill.day,
+    originOrder: previous ? Math.min(Number(previous.originOrder||order), order) : order,
+    updatedOrder: order
+  };
+}
+
+function ensureFixedRecurrenceTemplates(){
+  if(!state || !state.months) return;
+  state.fixedRecurrenceTemplates = state.fixedRecurrenceTemplates || {};
+
+  Object.keys(state.months)
+    .sort((a,b)=>monthKeyOrder(a)-monthKeyOrder(b))
+    .forEach(key=>{
+      const month = state.months[key];
+      if(!month || !Array.isArray(month.bills)) return;
+
+      month.bills.forEach(b=>{
+        if(b.isFixed) {
+          const [year, monthNum] = key.split('-').map(Number);
+          upsertFixedTemplate(year, monthNum, b);
+        }
+      });
+    });
+}
+
 function findRecurringBillsBefore(year, month){
+  const targetOrder = monthKeyOrder(monthKey(year, month));
+  const latestByOrigin = new Map();
+  const templates = state.fixedRecurrenceTemplates || {};
+  const stops = state.fixedRecurrenceStops || {};
+
+  Object.entries(templates).forEach(([originId, template])=>{
+    const stopOrder = Number(stops[originId]||0);
+    if(stopOrder && targetOrder >= stopOrder) return;
+    if(Number(template.originOrder||0) < targetOrder){
+      latestByOrigin.set(originId, template);
+    }
+  });
+
   let y = year, m = month;
-  for(let i = 0; i < 36; i++){
+  for(let i = 0; i < 60; i++){
     const prev = prevMonthKey(y, m);
     y = prev.year; m = prev.month;
     const key = monthKey(y, m);
     const data = state.months[key];
-    if(data){
-      return data.bills.filter(b => b.isFixed);
-    }
+    if(!data || !Array.isArray(data.bills)) continue;
+
+    data.bills.forEach(b=>{
+      if(!b.isFixed) return;
+      const originId = b.fixedOriginId || b.id;
+      const stopOrder = Number(stops[originId]||0);
+      if(stopOrder && targetOrder >= stopOrder) return;
+      if(!latestByOrigin.has(originId)){
+        latestByOrigin.set(originId, b);
+      }
+    });
   }
-  return [];
+
+  return [...latestByOrigin.entries()].map(([originId, b])=>({
+    ...b,
+    fixedOriginId: originId
+  }));
 }
 
 function defaultState(){
@@ -638,6 +940,8 @@ function defaultState(){
     goals:[],
     globalIncomeFixed: 0,
     incomeMinimized: false,
+    fixedRecurrenceStops: {},
+    fixedRecurrenceTemplates: {},
     _viewMonth: now.getMonth() + 1
   };
 }
@@ -653,6 +957,11 @@ function loadState(){
       if(state.globalIncomeFixed === undefined) state.globalIncomeFixed = 0;
       if(state.incomeMinimized === undefined) state.incomeMinimized = false;
       if(!state.goals) state.goals = [];
+      if(!state.fixedRecurrenceStops) state.fixedRecurrenceStops = {};
+      if(!state.fixedRecurrenceTemplates) state.fixedRecurrenceTemplates = {};
+      migrateInstallmentOrigins();
+      ensureFixedRecurrenceTemplates();
+      saveState();
       return;
     }
   }catch(e){ console.error('Erro ao carregar dados:', e); }
@@ -660,6 +969,58 @@ function loadState(){
   saveState();
 }
 
+function migrateInstallmentOrigins(){
+  if(!state || !state.months) return;
+
+  // Versões antigas não tinham um identificador para a série de parcelas.
+  // Para cada parcela sem origem, tentamos ligá-la à parcela imediatamente
+  // anterior da mesma série. Se for a primeira parcela, iniciamos uma série.
+  const months = Object.keys(state.months).sort((a,b)=>monthKeyOrder(a)-monthKeyOrder(b));
+
+  months.forEach((key, index)=>{
+    const month = state.months[key];
+    if(!month || !Array.isArray(month.bills)) return;
+
+    month.bills.forEach(b=>{
+      if((b.installmentCount||1) <= 1 || b.isFixed || b.installmentOriginId) return;
+
+      const current = Number(b.installmentCurrent||0);
+      const signature = [
+        String(b.name||'').trim().toLowerCase(),
+        b.category||'',
+        b.day ?? '',
+        Number(b.installmentCount||0)
+      ].join('|');
+
+      if(current === 1){
+        b.installmentOriginId = uid();
+        return;
+      }
+
+      let previous = null;
+      for(let i=index-1; i>=0 && !previous; i--){
+        const previousMonth = state.months[months[i]];
+        if(!previousMonth || !Array.isArray(previousMonth.bills)) continue;
+
+        previous = previousMonth.bills.find(candidate=>{
+          if((candidate.installmentCount||1) <= 1 || candidate.isFixed) return false;
+          if(Number(candidate.installmentCurrent||0) !== current - 1) return false;
+
+          const candidateSignature = [
+            String(candidate.name||'').trim().toLowerCase(),
+            candidate.category||'',
+            candidate.day ?? '',
+            Number(candidate.installmentCount||0)
+          ].join('|');
+
+          return candidateSignature === signature && candidate.installmentOriginId;
+        }) || null;
+      }
+
+      b.installmentOriginId = previous ? previous.installmentOriginId : uid();
+    });
+  });
+}
 function saveState(){
   try{
     state.selectedYear = ui.selectedYear;
@@ -724,6 +1085,50 @@ function propagateFixedBillForward(originYear, originMonth, template){
   });
 }
 
+function isRecurringBill(bill){
+  return !!(bill && (bill.isFixed || (bill.installmentCount||1) > 1));
+}
+
+function sameInstallmentSeries(a, b){
+  if(!a || !b || a.isFixed || b.isFixed) return false;
+  if((a.installmentCount||1) <= 1 || (b.installmentCount||1) <= 1) return false;
+
+  if(a.installmentOriginId && b.installmentOriginId){
+    return a.installmentOriginId === b.installmentOriginId;
+  }
+
+  // Fallback para dados antigos sem installmentOriginId.
+  return String(a.name||'').trim().toLowerCase() === String(b.name||'').trim().toLowerCase()
+    && (a.category||'') === (b.category||'')
+    && Number(a.day||0) === Number(b.day||0)
+    && Number(a.installmentCount||0) === Number(b.installmentCount||0)
+    && Number(b.installmentCurrent||0) >= Number(a.installmentCurrent||0);
+}
+
+function removeBillFromCurrentAndFuture(year, month, bill){
+  const originOrder = monthKeyOrder(monthKey(year, month));
+
+  Object.keys(state.months).forEach(key=>{
+    if(monthKeyOrder(key) < originOrder) return;
+
+    const monthData = state.months[key];
+    if(!monthData || !Array.isArray(monthData.bills)) return;
+
+    monthData.bills = monthData.bills.filter(candidate=>{
+      if(bill.isFixed){
+        const originId = bill.fixedOriginId || bill.id;
+        return !candidate.isFixed || (candidate.fixedOriginId || candidate.id) !== originId;
+      }
+
+      if((bill.installmentCount||1) > 1){
+        return !sameInstallmentSeries(bill, candidate);
+      }
+
+      return candidate.id !== bill.id;
+    });
+  });
+}
+
 // ---------- RENDER ----------
 const NAV_ITEMS = [
   { id:'home', icon:'fa-solid fa-house', label:'Home' },
@@ -765,6 +1170,7 @@ function render(){
       ${page === 'config' ? renderConfigPage(monthNum, m, totalIncome) : ''}
       <p class="foot-note">Os dados ficam salvos automaticamente no seu navegador.</p>
     </div>
+    ${renderDeleteDialog()}
     <nav class="bottom-nav">
       ${NAV_ITEMS.map(item => `
         <button class="nav-item ${page===item.id?'active':''}" data-action="nav" data-page="${item.id}">
@@ -773,6 +1179,45 @@ function render(){
         </button>
       `).join('')}
     </nav>
+  `;
+}
+
+function renderDeleteDialog(){
+  const dialog = ui.deleteDialog;
+  if(!dialog) return '';
+
+  const m = getMonthData(dialog.year, dialog.month);
+  const bill = m.bills.find(b=>b.id === dialog.id);
+  if(!bill) return '';
+
+  const isFixed = !!bill.isFixed;
+  const isInstallment = !isFixed && (bill.installmentCount||1) > 1;
+  const seriesLabel = isFixed ? 'conta fixa' : 'parcelamento';
+
+  return `
+    <div class="delete-modal-backdrop" role="presentation">
+      <div class="delete-modal" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+        <div class="delete-modal-icon"><i class="fa-solid fa-trash"></i></div>
+        <div class="delete-modal-content">
+          <h3 id="delete-modal-title">Excluir ${seriesLabel}?</h3>
+          <p><strong>${escapeHtml(bill.name)}</strong> — ${fmtMoney(bill.amount)}</p>
+          <span>Você pode apagar somente este mês ou também os registros dos meses seguintes.</span>
+        </div>
+        <div class="delete-modal-options">
+          <button type="button" class="delete-option" data-action="delete-bill-scope" data-scope="current">
+            <span class="delete-option-icon"><i class="fa-solid fa-calendar-day"></i></span>
+            <span><strong>Somente este mês</strong><small>Os próximos meses continuam como estão.</small></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+          <button type="button" class="delete-option danger" data-action="delete-bill-scope" data-scope="future">
+            <span class="delete-option-icon"><i class="fa-solid fa-calendar-xmark"></i></span>
+            <span><strong>Este mês e os próximos</strong><small>Remove esta conta/parcelas desta série para frente.</small></span>
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        <button type="button" class="btn btn-ghost delete-modal-cancel" data-action="cancel-delete">Cancelar</button>
+      </div>
+    </div>
   `;
 }
 
@@ -1228,29 +1673,64 @@ function renderBillsTable(bills, monthNum){
 function renderEditRow(b){
   const isInstallment = (b.installmentCount||1) > 1;
   return `
-    <form class="bill-row" data-action="edit-form" data-id="${b.id}" style="grid-template-columns:42px 1.2fr .8fr .7fr .9fr auto; background:var(--surface-hover); padding:12px 18px;">
-      <input type="number" name="day" min="1" max="31" value="${b.day||''}" style="width:100%; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary); text-align:center;">
-      <input type="text" name="name" value="${escapeHtml(b.name)}" required style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px 8px; background:var(--surface); color:var(--text-primary);">
-      <select name="category" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary);">
-        ${CATEGORIES.map(c=>`<option value="${c.id}" ${c.id===b.category?'selected':''}>${c.name}</option>`).join('')}
-      </select>
-      <input type="number" name="amount" step="0.01" min="0" value="${b.amount}" required style="width:100%; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary);">
-      <select name="installmentType" class="edit-installment-type" ${b.isFixed?'disabled':''} style="width:100%; border:1px solid var(--border); border-radius:6px; padding:6px; background:var(--surface); color:var(--text-primary); font-size:12px;">
-        <option value="avista" ${!isInstallment?'selected':''}>À vista</option>
-        <option value="parcelado" ${isInstallment?'selected':''}>Parcelado</option>
-      </select>
-      <div style="display:flex; gap:6px; align-items:center;">
-        <button type="submit" class="btn btn-accent btn-small">Salvar</button>
-        <button type="button" class="btn btn-ghost btn-small" data-action="cancel-edit">Cancelar</button>
+    <form class="edit-bill-form" data-action="edit-form" data-id="${b.id}">
+      <div class="edit-form-head">
+        <div>
+          <strong><i class="fa-solid fa-pen"></i> Editando conta</strong>
+          <span>Altere os dados abaixo e salve.</span>
+        </div>
+        <button type="button" class="icon-btn edit-close-btn" data-action="cancel-edit" title="Cancelar edição" aria-label="Cancelar edição">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
       </div>
-      <div style="display:flex; flex-direction:column; gap:4px; grid-column:1/-1;" class="edit-installment-field ${(isInstallment && !b.isFixed)?'':'hidden'}">
-        <input type="number" name="installmentCount" min="2" max="48" value="${Math.max(2, b.installmentCount||2)}" ${(isInstallment && !b.isFixed)?'':'disabled'} style="width:140px; font-family:'JetBrains Mono',monospace; border:1px solid var(--border); border-radius:6px; padding:4px 6px; background:var(--surface); color:var(--text-primary); font-size:11px;" placeholder="Qtd parcelas">
+
+      <div class="edit-form-grid">
+        <div class="field edit-field-day">
+          <label>Dia venc.</label>
+          <input type="number" name="day" min="1" max="31" value="${b.day||''}" inputmode="numeric" placeholder="10">
+        </div>
+
+        <div class="field edit-field-name">
+          <label>Nome da conta</label>
+          <input type="text" name="name" value="${escapeHtml(b.name)}" required autocomplete="off">
+        </div>
+
+        <div class="field">
+          <label>Categoria</label>
+          <select name="category">
+            ${CATEGORIES.map(c=>`<option value="${c.id}" ${c.id===b.category?'selected':''}>${c.name}</option>`).join('')}
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Valor</label>
+          <input type="number" name="amount" step="0.01" min="0" value="${b.amount}" required inputmode="decimal">
+        </div>
+
+        <div class="field">
+          <label>Tipo</label>
+          <select name="installmentType" class="edit-installment-type" ${b.isFixed?'disabled':''}>
+            <option value="avista" ${!isInstallment?'selected':''}>À vista</option>
+            <option value="parcelado" ${isInstallment?'selected':''}>Parcelado</option>
+          </select>
+        </div>
       </div>
-      <div style="grid-column:1/-1;">
-        <label class="checkbox-field">
-          <input type="checkbox" name="isFixed" ${b.isFixed?'checked':''}>
-          <span>Conta fixa <small>(repete todo mês)</small></span>
-        </label>
+
+      <div class="edit-installment-field ${(isInstallment && !b.isFixed)?'':'hidden'}">
+        <div class="field">
+          <label>Quantidade de parcelas</label>
+          <input type="number" name="installmentCount" min="2" max="48" value="${Math.max(2, b.installmentCount||2)}" ${(isInstallment && !b.isFixed)?'':'disabled'} inputmode="numeric" placeholder="Ex: 3">
+        </div>
+      </div>
+
+      <label class="checkbox-field edit-fixed-check">
+        <input type="checkbox" name="isFixed" ${b.isFixed?'checked':''}>
+        <span>Conta fixa <small>(repete todo mês)</small></span>
+      </label>
+
+      <div class="edit-form-actions">
+        <button type="submit" class="btn btn-accent"><i class="fa-solid fa-check"></i> Salvar alterações</button>
+        <button type="button" class="btn btn-ghost" data-action="cancel-edit">Cancelar</button>
       </div>
     </form>
   `;
@@ -1299,6 +1779,8 @@ function normalizeImportedData(payload){
     goals: Array.isArray(data.goals) ? data.goals : [],
     globalIncomeFixed: Number(data.globalIncomeFixed)||0,
     incomeMinimized: !!data.incomeMinimized,
+    fixedRecurrenceStops: data.fixedRecurrenceStops && typeof data.fixedRecurrenceStops === 'object' ? data.fixedRecurrenceStops : {},
+    fixedRecurrenceTemplates: data.fixedRecurrenceTemplates && typeof data.fixedRecurrenceTemplates === 'object' ? data.fixedRecurrenceTemplates : {},
     _viewMonth: Number(data._viewMonth)||new Date().getMonth()+1,
     selectedYear: Number(data.selectedYear)||new Date().getFullYear()
   };
@@ -1318,6 +1800,10 @@ function importDataFromFile(file, mode){
         state = incoming;
         ui.selectedYear = incoming.selectedYear;
         ui.editingId = null;
+        if(!state.fixedRecurrenceStops) state.fixedRecurrenceStops = {};
+        if(!state.fixedRecurrenceTemplates) state.fixedRecurrenceTemplates = {};
+        migrateInstallmentOrigins();
+        ensureFixedRecurrenceTemplates();
         saveState();
         render();
         alert('Dados importados com sucesso!');
@@ -1404,6 +1890,15 @@ function mergeRecord(list, incomingRecord, identityFn, fields, titleFn){
 
 function mergeState(incoming){
   state.budgets = {...(state.budgets||{}), ...(incoming.budgets||{})};
+  state.fixedRecurrenceStops = {...(state.fixedRecurrenceStops||{})};
+  Object.entries(incoming.fixedRecurrenceStops||{}).forEach(([originId, stopOrder])=>{
+    const currentStop = Number(state.fixedRecurrenceStops[originId]||0);
+    const incomingStop = Number(stopOrder||0);
+    if(incomingStop && (!currentStop || incomingStop < currentStop)){
+      state.fixedRecurrenceStops[originId] = incomingStop;
+    }
+  });
+  state.fixedRecurrenceTemplates = {...(state.fixedRecurrenceTemplates||{}), ...(incoming.fixedRecurrenceTemplates||{})};
   if(incoming.globalIncomeFixed !== undefined && incoming.globalIncomeFixed !== state.globalIncomeFixed){
     const choice = askMergeConflict(
       'Renda fixa mensal',
@@ -1580,11 +2075,55 @@ function attachEvents(){
       const id = btn.dataset.id;
       const monthNum = parseInt(btn.dataset.month || state._viewMonth, 10);
       const m = getMonthData(ui.selectedYear, monthNum);
-      if(confirm('Excluir esta conta?')){
+      const bill = m.bills.find(b=>b.id===id);
+
+      if(!bill) return;
+
+      if(isRecurringBill(bill)){
+        ui.deleteDialog = { id, year: ui.selectedYear, month: monthNum };
+        render();
+        return;
+      }
+
+      if(confirm('Excluir esta conta deste mês?')){
         m.bills = m.bills.filter(b=>b.id!==id);
         saveState();
         render();
       }
+      return;
+    }
+
+    if(action==='cancel-delete'){
+      ui.deleteDialog = null;
+      render();
+      return;
+    }
+
+    if(action==='delete-bill-scope'){
+      const dialog = ui.deleteDialog;
+      if(!dialog) return;
+
+      const monthData = getMonthData(dialog.year, dialog.month);
+      const bill = monthData.bills.find(b=>b.id===dialog.id);
+      if(!bill){
+        ui.deleteDialog = null;
+        render();
+        return;
+      }
+
+      if(btn.dataset.scope === 'future'){
+        if(bill.isFixed){
+          const originId = bill.fixedOriginId || bill.id;
+          state.fixedRecurrenceStops[originId] = monthKeyOrder(monthKey(dialog.year, dialog.month));
+        }
+        removeBillFromCurrentAndFuture(dialog.year, dialog.month, bill);
+      }else{
+        monthData.bills = monthData.bills.filter(b=>b.id!==bill.id);
+      }
+
+      ui.deleteDialog = null;
+      saveState();
+      render();
       return;
     }
     if(action==='edit-bill'){
@@ -1633,10 +2172,12 @@ function attachEvents(){
           fixedOriginId: fixedOriginId
         };
         monthData.bills.push(newBill);
+        upsertFixedTemplate(ui.selectedYear, viewMonth, newBill);
         propagateFixedBillForward(ui.selectedYear, viewMonth, newBill);
       } else {
         let currentYear = ui.selectedYear;
         let currentMonthNum = viewMonth;
+        const installmentOriginId = uid();
         for(let i = 1; i <= installmentCount; i++){
           const monthData = getMonthData(currentYear, currentMonthNum);
           const bill = {
@@ -1647,7 +2188,8 @@ function attachEvents(){
             day: day,
             paid: false,
             installmentCount: installmentCount,
-            installmentCurrent: i
+            installmentCurrent: i,
+            installmentOriginId: installmentOriginId
           };
           monthData.bills.push(bill);
           const next = nextMonthKey(currentYear, currentMonthNum);
@@ -1684,13 +2226,24 @@ function attachEvents(){
         bill.day = fd.get('day') ? parseInt(fd.get('day'),10) : null;
         const installmentType = fd.get('installmentType') || 'avista';
         const isFixed = fd.get('isFixed') === 'on';
-        bill.installmentCount = (!isFixed && installmentType === 'parcelado') ? Math.max(2, parseInt(fd.get('installmentCount'))||2) : 1;
+        const wasInstallment = (bill.installmentCount||1) > 1 && !bill.isFixed;
+        const willBeInstallment = !isFixed && installmentType === 'parcelado';
+
+        if(willBeInstallment && !bill.installmentOriginId){
+          bill.installmentOriginId = uid();
+        }
+        if(!willBeInstallment){
+          delete bill.installmentOriginId;
+        }
+
+        bill.installmentCount = willBeInstallment ? Math.max(2, parseInt(fd.get('installmentCount'))||2) : 1;
         bill.isFixed = isFixed;
         if(isFixed){
           // Garante um id de linhagem (contas fixas antigas podem não ter) e
           // sincroniza nome/categoria/valor/dia com os meses futuros já
           // gerados a partir desta conta fixa.
           if(!bill.fixedOriginId) bill.fixedOriginId = bill.id;
+          upsertFixedTemplate(ui.selectedYear, currentMonthNum(), bill);
           propagateFixedBillForward(ui.selectedYear, currentMonthNum(), bill);
         }
       }
